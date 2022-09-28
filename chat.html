@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel='stylesheet' href='styles/style.css' />
+    <link rel='stylesheet' href='styles/js-snackbar.css' />
+    <script src='scripts/jquery-3.6.0.js'></script>
+    <script src="scripts/js-snackbar.js"></script>
+    <script src="node_modules/socket.io/client-dist/socket.io.js"></script>
+    <script src="node_modules/socketio-file-upload/client.js"></script>
+    <title>Chat</title>
+    <script>
+        $(() => {
+           
+            var socket = io('http://localhost:3000');
+            socket.on('connect', () => {
+                var uploader = new SocketIOFileUpload(socket);
+                uploader.listenOnInput(document.getElementById("fu"))
+                uploader.listenOnDrop(document.getElementById("drop"));
+                $('#panelconnect').show();
+                $('#connect').click(() => {
+                   
+                    socket.emit('register', $('#name').val());
+                });
+                $('#send').click(() => {
+                    console.log('ok');
+                    socket.emit('chat', $('#msg').val());
+                });
+                $('#upload').click(() => {
+                    $('#fu').trigger('click');
+                });
+                socket.on('regsuccess', name => {
+                    console.log(name);
+                    $('#panelconnect').hide();
+                    $('#panelchat').show();
+                    $('#panelmessages').show();
+                    $('#panelname')
+                    .show();
+                    $("#dname").html(name);
+                });
+                socket.on('userlist', names => {
+                    console.log(names);
+                    $('#users').empty(),
+                        names.forEach(n => {
+                            $('#users').append(`<li>${n}</li>`);
+                        });
+                });
+                socket.on('message', m => {
+
+                    $('#messages').append(`<li>${m.from}: ${m.msg}</li>`);
+
+                });
+                socket.on('uploaded', m => {
+                    
+                    var ext= getIcon(m.extension);
+                    console.log(`<figure>
+                        <img src="${ext}" />
+                        <figcaption>Uploaded by ${m.from}</figcaption>
+                        <a target='_blank' href="uploads/${m.file}">Download</a>
+                        </figure>`);
+                    $('#files').append(`<figure>
+                        <img src="${ext}" />
+                        <figcaption>Uploaded by ${m.from}</figcaption>
+                        <a target='_blank' href="uploads/${m.file}">Download</a>
+                        </figure>`);
+
+                });
+                uploader.addEventListener("complete", function (event) {
+                    console.log(event.success);
+                    SnackBar({
+                        message: `${event.file.name} uploaded`,
+                        position: "bc"
+                    });
+                });
+            });
+            /*******†****************/
+            $('.bar').click(() => {
+                $('.nav').toggleClass('active');
+            });
+        });
+        function getIcon(ext) {
+           console.log(ext)
+            switch (ext) {
+                case "doc":
+                    return "/images/doc.png";
+                case "docx":
+                    return "/images/doc.png";
+                case "jpg":
+                    return "/images/img.png";
+                case "jpeg":
+                    return "/images/img.png"
+                case "gif":
+                    return "/images/img.png"
+                case "png":
+                    return "/images/img.png";
+                case "svg":
+                    return "/images/svg.png";
+                case "zip":
+                    return "/images/zip.png";
+                case "rar":
+                    return "/images/zip.png"
+                case "tar":
+                    return "/images/zip.png"
+                default:
+                    return "/images/file.png";
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <nav class='navbar dark-primary-color '>
+        <span class='bar' href='#'>&#9776;</span>
+        <span class='brand' href='#'>Chat <sup>app</sup></span>
+        <ul class='nav'>
+            <li><a href='index.html'>Home</a></li>
+            <li><a href='chat.html'>Chat</a></li>
+            <li><a href='about.html'>About</a></li>
+        </ul>
+    </nav>
+    <div class='container'>
+        <div class="row ml mr fbottom" id="panelchat" style="display:none">
+
+
+
+            <div class='c4-4'>
+                <div class="drop mt" id="drop">
+                    Drop files here
+                </div>
+                <div class='ig'>
+                    <input type='text' class='it' id='msg' />
+                    <button class='b' id='send'>Send</button>
+                    <button class='b' id='upload'>Files</button>
+                </div>
+            </div>
+
+        </div>
+        <div class='row mt mb' id='panelconnect' style='display:none'>
+            <div class='c1-4'></div>
+            <div class='c2-4'>
+                <div class='ig'>
+                    <input type='text' class='it' id='name' placeholder='display name..' />
+                    <button class='b' id='connect'>Connect</button>
+                </div>
+            </div>
+            <div class='c1-4'></div>
+        </div>
+        <div class='row mt mb' id='panelname' style='display:none'>
+            <div class='c1-4'></div>
+            <div class='c2-4'>
+                User name: <span id="dname"></span>
+            </div>
+            <div class='c1-4'></div>
+        </div>
+        <div class='row mt mb' id='panelmessages' style='display:none'>
+            <div class='c1-4'>
+                <div class='list-header'>
+                    Users
+                </div>
+                <ul class='list' id="users">
+    
+                </ul>
+            </div>
+    
+            <div class='c3-4 pl'>
+    
+    
+                <div class='list-header mt'>
+                    Messages
+                </div>
+                <ul class='list' id="messages">
+                    <li><span class='user'>Usain Bolt</span>: Hello</li>
+                    <li><span class='user'>Usain Bolt</span>: Hello</li>
+                </ul>
+                <div class='files mt' id="files">
+    
+                    <!-- <figure>
+                                                                            <img src="uploads/4e44a9ae-4c92-4f0c-b1a2-d517345f39d2.png" />
+                                                                            <figcaption>Uploaded by Hhh</figcaption>
+                                                                            <a href="#">Download</a>
+                                                                        </figure> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+   
+    
+    <input type='file' id='fu' style='display:none;' />
+</body>
+
+</html>

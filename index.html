@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel='stylesheet' href='styles/style.css' />
+    <link rel='stylesheet' href='styles/js-snackbar.css' />
+    <script src='scripts/jquery-3.6.0.js'></script>
+    <script src="scripts/js-snackbar.js"></script>
+    <title>Hello, world!</title>
+    <script>
+    		$(()=>{
+				$('.bar').click(()=>{
+					$('.nav').toggleClass('active');
+					});
+			});
+    </script>
+  </head>
+  <body>
+  <nav class='navbar' >
+  	<span class='bar' href='#'>&#9776;</span>
+  	<span class='brand' href='#'>Chat <sup>app</sup></span>
+      	<ul class='nav'>
+      		<li><a href='index.html'>Home</a></li>
+     		 <li><a href='./chat.html'>Chat</a></li>
+     		<li><a href='about.html'>About</a></li>
+      	</ul>
+ </nav>
+ <div class='container'>
+ 
+ </div>
+  </body>
+</html>
